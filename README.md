@@ -30,11 +30,11 @@ flowchart LR
 
 ## Model and Data
 
-The synthetic dataset contains temperature-delta and vibration signals. Input samples use windows of 32 time steps and two features, with a future drift target.
+The synthetic dataset contains temperature-delta and vibration signals sampled at 0.1-second intervals. Each model input is a 32-step window with two features: temperature delta and vibration. The target is the simulated drift 20 sampling steps after the end of the input window, corresponding to a nominal forecast horizon of 2 seconds in the simulation.
 
-The target generator includes linear temperature and vibration terms, a nonlinear temperature term, and noise. The compact neural network is trained with PyTorch and evaluated using run-level splits so windows from the same simulated run do not leak across training, validation, and test sets.
+The model is a compact multilayer perceptron (MLP): the flattened input passes through fully connected layers with 64 and 32 hidden units, using ReLU activations, before producing a single drift estimate in millimeters. Temperature delta is scaled by dividing it by 10; vibration is left unchanged.
 
-The approach is **physics-inspired**, not a strict physics-informed neural network (PINN). The data and results are simulated and should not be interpreted as evidence of performance on real machines.
+The target equation is an illustrative synthetic relationship, not a calibrated physical model of any specific machine. The approach is physics-inspired, not a strict physics-informed neural network (PINN).
 
 ## Held-Out Synthetic Evaluation
 
@@ -46,7 +46,9 @@ Previously recorded evaluation results:
 | RMSE | 0.000671 mm | 0.002012 mm |
 | Maximum absolute error | 0.002488 mm | 0.005038 mm |
 
-The neural model's MAE was approximately 69.4% lower than the proxy baseline on this held-out synthetic test set. These results describe only the simulated experiment; they do not establish real-world accuracy.
+The proxy baseline uses only the last observed temperature-delta and vibration values in each input window, applying a simple linear formula without the nonlinear temperature term. The neural model instead uses the full 32-step input window.
+
+On the recorded held-out synthetic test set, the neural model's MAE was approximately 69.4% lower than this proxy baseline. This comparison measures performance against a simple reference, not against a validated industrial estimator or a comprehensive set of alternative models. Exact metrics may vary when the experiment is rerun.
 
 ## ONNX and C++ Deployment
 
@@ -71,16 +73,22 @@ One recorded benchmark run on the development PC:
 
 | Setting / metric | Value |
 |---|---:|
-| Runtime | ONNX Runtime CPU |
+| CPU | Intel Core i7-9750H @ 2.60 GHz |
+| Operating system | Windows 10 Home (OS build 26200) |
+| Runtime | ONNX Runtime 1.31.0 CPU |
 | Intra-op threads | 1 |
 | Warm-up iterations | 100 |
 | Measured iterations | 5,000 |
-| Average latency | 14.859 µs |
-| Median latency | 14.500 µs |
-| P95 latency | 15.400 µs |
+| Average latency | 15.706 µs |
+| Median latency | 15.300 µs |
+| P95 latency | 16.300 µs |
 | P99 latency | 27.100 µs |
+| Minimum latency | 14.100 µs |
+| Maximum latency | 82.100 µs |
 
-These figures are machine-dependent measurements of model inference calls. They exclude sensor acquisition, application startup, model loading, and end-to-end machine response time. They are a development benchmark, not a real-time guarantee.
+These statistics come from one benchmark run using repeated C++ ONNX Runtime CPU inference calls, after 100 warm-up iterations and across 5,000 measured iterations. Results may vary with system load, operating-system scheduling, and software environment.
+
+The measurements exclude sensor acquisition, application startup, model loading, communication, and machine-control response time. They do not establish hard real-time behavior or a production-level latency guarantee.
 
 ## Requirements
 
