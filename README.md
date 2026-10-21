@@ -92,12 +92,17 @@ The measurements exclude sensor acquisition, application startup, model loading,
 
 ## Requirements
 
-- Python and the packages listed in `requirements.txt`
-- CMake
-- A compatible Microsoft C++ build toolchain on Windows
-- ONNX Runtime C++ package compatible with the runtime linked by the project
+### Python environment
+- Python compatible with the packages listed in `requirements.txt`
+- `pip` and `venv`
 
-The current development environment used Windows, MSVC, CMake, and ONNX Runtime 1.31.0.
+### C++ build environment (Windows)
+- CMake
+- Microsoft Visual Studio C++ build tools with a compatible MSVC compiler
+- Windows x64 build environment
+- ONNX Runtime 1.31.0 C++ headers, import library, and runtime DLL, provided under `third_party/onnxruntime-win-x64-1.31.0/`
+
+The C++ demo is configured for a Windows x64 build using CMake and MSVC. Other operating systems and toolchains have not been validated.
 
 ## Reproduce the Python Experiments
 
