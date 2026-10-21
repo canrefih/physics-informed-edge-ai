@@ -1,0 +1,9 @@
+# Top-level versions tested on Windows x64 with Python 3.14.7.
+# Transitive packages are resolved by pip; this is not a full dependency lock.
+numpy==2.5.4
+torch==2.14.1
+pytest==9.1.1
+onnxruntime==1.31.0
+onnx==1.23.2
+onnxscript==0.7.2
+matplotlib==3.11.2

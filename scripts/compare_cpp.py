@@ -1,79 +1,62 @@
-﻿import re
+"""Compare multiple preprocessed windows through Python and C++ ONNX Runtime."""
+import argparse
+import re
 import subprocess
+import sys
+import tempfile
 from pathlib import Path
 
 import numpy as np
 import onnxruntime as ort
 
 ROOT = Path(__file__).resolve().parents[1]
-MODEL = ROOT / "artifacts" / "model.onnx"
-EXE = ROOT / "build" / "Release" / "edge_ai_cpp.exe"
+sys.path.insert(0, str(ROOT / "src"))
+from edge_ai.experiment import environment, sha256, write_json
+
 
 def main():
-    if not MODEL.exists():
-        raise FileNotFoundError(f"ONNX model not found: {MODEL}")
-    if not EXE.exists():
-        raise FileNotFoundError(
-            f"C++ executable not found: {EXE}. Build the project first."
-        )
-
-    # Reproduce the exact synthetic input generated in cpp/main.cpp.
-    x = np.zeros((1, 32, 2), dtype=np.float32)
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output", default="results/cpp_parity.json")
+    args = parser.parse_args()
+    model = ROOT / "artifacts/model.onnx"
+    exe = ROOT / "build/Release/edge_ai_cpp.exe"
+    if not exe.exists():
+        raise FileNotFoundError("Build the Release C++ demo first.")
+    rng = np.random.default_rng(123)
+    windows = rng.uniform([0.0, 0.0], [0.4, 0.5], size=(16, 32, 2)).astype(np.float32)
+    windows[0] = 0
     for t in range(32):
-        temperature_delta = np.float32(
-            1.0 + 2.0 * t / 31.0
-        )
-        vibration = np.float32(
-            0.15 + 0.10 * (t % 8) / 7.0
-        )
+        windows[1, t] = [(1.0 + 2.0 * t / 31.0) / 10.0, 0.15 + 0.10 * (t % 8) / 7.0]
+    session = ort.InferenceSession(str(model), providers=["CPUExecutionProvider"])
+    records = []
+    with tempfile.TemporaryDirectory(dir=ROOT) as temp:
+        path = Path(temp) / "window.txt"
+        for index, window in enumerate(windows):
+            np.savetxt(path, window.reshape(-1), fmt="%.9g")
+            result = subprocess.run(
+                [str(exe), "--input", str(path), "--predict-only"],
+                cwd=ROOT, text=True, capture_output=True, check=True,
+            )
+            match = re.search(r"Predicted drift:\s*([-+0-9.eE]+)\s*mm", result.stdout)
+            if not match:
+                raise RuntimeError("Could not parse C++ prediction: " + result.stdout)
+            cpp = float(match.group(1))
+            python = float(session.run(["predicted_drift_mm"], {"sensor_window": window[None]})[0][0])
+            difference = abs(python - cpp)
+            records.append({"case": index, "python_mm": python, "cpp_mm": cpp,
+                            "absolute_difference_mm": difference,
+                            "passed": bool(np.isfinite(difference) and difference <= 1e-6)})
+    passed = all(row["passed"] for row in records)
+    write_json(ROOT / args.output, {
+        "environment": environment(), "model_sha256": sha256(model),
+        "executable_sha256": sha256(exe), "seed": 123, "tolerance_mm": 1e-6,
+        "scope": "zero window, demo window, 14 random preprocessed windows; no accuracy claim",
+        "passed": passed, "cases": records,
+    })
+    print(f"{'PASS' if passed else 'FAIL'}: {len(records)} Python/C++ cases")
+    if not passed:
+        raise SystemExit(1)
 
-        x[0, t, 0] = temperature_delta / 10.0
-        x[0, t, 1] = vibration
-
-    # Python ONNX Runtime prediction
-    session = ort.InferenceSession(
-        str(MODEL),
-        providers=["CPUExecutionProvider"],
-    )
-    python_prediction = float(
-        session.run(["predicted_drift_mm"], {
-            "sensor_window": x
-        })[0][0]
-    )
-
-    # Run the C++ program using the same embedded input.
-    result = subprocess.run(
-        [str(EXE)],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-
-    match = re.search(
-        r"Predicted drift:\s*([-+]?\d+(?:\.\d+)?)\s*mm",
-        result.stdout,
-    )
-    if not match:
-        print(result.stdout)
-        raise RuntimeError("Could not parse C++ prediction.")
-
-    cpp_prediction = float(match.group(1))
-    difference = abs(python_prediction - cpp_prediction)
-    tolerance = 1e-5  # mm; C++ output is rounded to six decimals.
-
-    print("Python ONNX prediction :", f"{python_prediction:.9f}", "mm")
-    print("C++ ONNX prediction    :", f"{cpp_prediction:.9f}", "mm")
-    print("Absolute difference    :", f"{difference:.9f}", "mm")
-    print("Allowed tolerance      :", f"{tolerance:.9f}", "mm")
-
-    if difference <= tolerance:
-        print("\nPASS: Python and C++ predictions match within tolerance.")
-    else:
-        raise SystemExit(
-            "\nFAIL: Predictions differ beyond tolerance."
-        )
 
 if __name__ == "__main__":
     main()

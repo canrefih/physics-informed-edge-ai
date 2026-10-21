@@ -1,3 +1,4 @@
+import argparse
 import sys
 from pathlib import Path
 
@@ -8,67 +9,79 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from edge_ai.model import DriftRegressor
+from edge_ai.experiment import (
+    environment, load_dataset, metrics, scale_inputs, sha256,
+    validate_checkpoint, write_json,
+)
 
 
-def report_metrics(name, target, prediction):
-    error = prediction - target
-    mae = np.mean(np.abs(error))
-    rmse = np.sqrt(np.mean(error**2))
-    max_error = np.max(np.abs(error))
+def fit_linear(X, y, alpha=0.0):
+    """Intercept + full-window features; ridge does not penalize intercept."""
+    design = np.column_stack((np.ones(len(X)), X.reshape(len(X), -1))).astype(np.float64)
+    if alpha == 0:
+        return np.linalg.lstsq(design, y, rcond=None)[0]
+    penalty = np.eye(design.shape[1]) * np.sqrt(alpha)
+    penalty[0, 0] = 0.0
+    return np.linalg.lstsq(
+        np.vstack((design, penalty)), np.concatenate((y, np.zeros(design.shape[1]))),
+        rcond=None,
+    )[0]
 
-    print(f"\n{name}")
-    print(f"  MAE:           {mae:.6f} mm")
-    print(f"  RMSE:          {rmse:.6f} mm")
-    print(f"  Max abs error: {max_error:.6f} mm")
+
+def linear_predict(X, weights):
+    design = np.column_stack((np.ones(len(X)), X.reshape(len(X), -1)))
+    return design @ weights
 
 
 def main():
-    data = np.load(ROOT / "data/synthetic_dataset.npz")
-    X, y, run_ids = data["X"], data["y"], data["run_ids"]
-
-    # Must match the split used in train.py.
-    unique_runs = np.unique(run_ids)
-    rng = np.random.default_rng(42)
-    rng.shuffle(unique_runs)
-
-    n_train = int(0.70 * len(unique_runs))
-    n_val = int(0.15 * len(unique_runs))
-    test_runs = unique_runs[n_train + n_val:]
-    mask = np.isin(run_ids, test_runs)
-
-    X_test = X[mask].copy()
-    y_test = y[mask]
-
-    # Same preprocessing as training.
-    X_test[:, :, 0] /= 10.0
-
-    checkpoint = torch.load(
-        ROOT / "artifacts/model.pt",
-        map_location="cpu",
-        weights_only=True,
-    )
-    model = DriftRegressor(
-        window_size=checkpoint["window_size"],
-        channels=checkpoint["channels"],
-        hidden_dim=checkpoint["hidden_dim"],
-    )
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data", default="data/synthetic_dataset.npz")
+    parser.add_argument("--model", default="artifacts/model.pt")
+    parser.add_argument("--output", default="results/evaluation.json")
+    args = parser.parse_args()
+    data_path, model_path = ROOT / args.data, ROOT / args.model
+    X, y, ids, metadata = load_dataset(data_path)
+    checkpoint = torch.load(model_path, map_location="cpu", weights_only=True)
+    validate_checkpoint(checkpoint, data_path, ids)
+    masks = {name: np.isin(ids, runs) for name, runs in checkpoint["split"].items()}
+    scaled = scale_inputs(X)
+    model = DriftRegressor(checkpoint["window_size"], checkpoint["channels"], checkpoint["hidden_dim"])
     model.load_state_dict(checkpoint["state_dict"])
     model.eval()
-
     with torch.no_grad():
-        prediction = model(
-            torch.from_numpy(X_test)
-        ).numpy()
-
-    report_metrics("Neural network", y_test, prediction)
-
-    # Transparent simple baseline using the last observed inputs.
-    raw = X[mask]
-    baseline = (
-        0.010 * raw[:, -1, 0]
-        + 0.004 * raw[:, -1, 1]
-    )
-    report_metrics("Simple proxy baseline", y_test, baseline)
+        neural = model(torch.from_numpy(scaled[masks["test"]])).numpy()
+    train, val, test = (masks[name] for name in ("train", "validation", "test"))
+    ols = fit_linear(scaled[train], y[train])
+    candidates = []
+    for alpha in (1e-6, 1e-4, 1e-2, 1.0):
+        weights = fit_linear(scaled[train], y[train], alpha)
+        score = metrics(y[val], linear_predict(scaled[val], weights))["rmse_mm"]
+        candidates.append((score, alpha, weights))
+    _, best_alpha, ridge = min(candidates, key=lambda item: item[0])
+    predictions = {
+        "neural": neural,
+        "last_value_proxy": 0.010 * X[test, -1, 0] + 0.004 * X[test, -1, 1],
+        "linear_full_window": linear_predict(scaled[test], ols),
+        "ridge_full_window": linear_predict(scaled[test], ridge),
+    }
+    scores = {name: metrics(y[test], prediction) for name, prediction in predictions.items()}
+    report = {
+        "environment": environment(), "dataset_sha256": sha256(data_path),
+        "model_sha256": sha256(model_path), "dataset_metadata": metadata,
+        "split": checkpoint["split"],
+        "sample_counts": {name: int(mask.sum()) for name, mask in masks.items()},
+        "ridge": {"selected_alpha": best_alpha,
+                  "selection": "minimum validation RMSE; fit on training runs only",
+                  "candidates": [{"alpha": a, "validation_rmse_mm": s} for s, a, _ in candidates]},
+        "metrics": scores,
+    }
+    output = ROOT / args.output
+    write_json(output, report)
+    np.savez_compressed(output.with_suffix(".predictions.npz"),
+                        target_mm=y[test], run_ids=ids[test], **predictions)
+    for name, score in scores.items():
+        print(f"{name}: MAE={score['mae_mm']:.9f} mm; RMSE={score['rmse_mm']:.9f} mm")
+    print(f"Saved report: {output}")
 
 
 if __name__ == "__main__":

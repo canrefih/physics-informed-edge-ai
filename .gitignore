@@ -9,6 +9,10 @@ artifacts/*
 !artifacts/model.onnx
 !artifacts/model.onnx.data
 build/
+.tmp/
+results/*.npz
+!artifacts/model.training.json
+!artifacts/model.export.json
 
 # Debug symbols are not required for the demo
 *.pdb

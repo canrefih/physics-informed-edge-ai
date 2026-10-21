@@ -1,4 +1,5 @@
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -27,7 +28,15 @@ def main():
 
     output = ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)
-    np.savez_compressed(output, X=X, y=y, run_ids=run_ids)
+    metadata = {
+        "generator": "make_runs_v1", "seed": args.seed,
+        "num_runs": args.runs, "steps_per_run": args.steps,
+        "sample_period_s": 0.1, "window_size": 32, "forecast_steps": 20,
+        "temperature_reference": "first measurement of each run",
+        "vibration_units": "arbitrary synthetic units",
+    }
+    np.savez_compressed(output, X=X, y=y, run_ids=run_ids,
+                        metadata=json.dumps(metadata, sort_keys=True))
 
     print(f"Saved dataset: {output}")
     print(f"X shape: {X.shape}")

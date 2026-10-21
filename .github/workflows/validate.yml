@@ -1,0 +1,39 @@
+name: Validate synthetic experiment
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: pip
+      - run: python -m pip install -r requirements-tested.txt
+      - run: python scripts/generate_data.py
+      - run: python scripts/train.py --epochs 50
+      - run: python scripts/evaluate.py
+      - run: python scripts/export_onnx.py
+      - run: python scripts/plot_results.py
+      - run: python -m pytest tests/ -v --junitxml=results/tests.xml
+      - run: cmake -S . -B build -A x64
+      - run: cmake --build build --config Release
+      - run: python scripts/compare_cpp.py
+      - run: python scripts/benchmark_cpp.py --runs 3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: synthetic-experiment-windows
+          path: |
+            results/
+            artifacts/model.training.json
+            artifacts/model.export.json
+            artifacts/model.pt
+            artifacts/model.onnx

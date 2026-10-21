@@ -1,0 +1,168 @@
+{
+  "environment": {
+    "created_at_utc": "2026-10-21T15:00:11.643568+00:00",
+    "python": "3.14.7",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "packages": {
+      "numpy": "2.5.4",
+      "torch": "2.14.1",
+      "onnx": "1.23.2",
+      "onnxruntime": "1.31.0",
+      "onnxscript": "0.7.2",
+      "pytest": "9.1.1",
+      "matplotlib": "3.11.2"
+    },
+    "source_commit": "2088e0b0464823142461750a9702e8f0d9c011d9",
+    "source_dirty": true,
+    "source_files_sha256": {
+      "CMakeLists.txt": "ff97c4a6407ccf63f8706d09c51e68677dcdb4b64355f31182d2d378b79bcbcd",
+      "cpp/main.cpp": "ff9e60e61b293b20826fd0f67b62c2002f21b86dfad9685349d103050a0de28e",
+      "requirements.txt": "b00e4ede40beb8ff7c407df4e11c707e0df7bc0bb427c04a21c495ca829ba6c6",
+      "scripts/benchmark_cpp.py": "ba82a6c33793ce577ff0356dea686d5a5db54d17f0222dabf04ebd9e0cadfc3e",
+      "scripts/compare_cpp.py": "40268388b633ffb480af6d63e0857591c4b132d8457ce052e7f27cb54a948a61",
+      "scripts/evaluate.py": "a1a72c8e43ff76c600e472145b6830b8cd2aa7b423ab7c9f27f3c91b3398c5c8",
+      "scripts/export_onnx.py": "fd9cf394408cc12fd2b4b5d0f95da69e0b6b69e5f7a52de2938df4dc5377f6fb",
+      "scripts/generate_data.py": "af83d7b08a8b021ceb8b55c31e109de5d53538980897a7bf34a074708ac5cbe9",
+      "scripts/plot_results.py": "934a7c96f04a3c7fba5db5f03c19b70cc185cae05e7be6a82184fe83c48ff5cb",
+      "scripts/train.py": "c35bd0a684ac0eeb304a0abcfa06829e2b36bbd11eb2b0d11199700bf903b626",
+      "src/edge_ai/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/edge_ai/dataset.py": "a2e119f85c3a04ff7fd848ce1015dd890caefa7631fc7e0ccd0144b59bd84f56",
+      "src/edge_ai/experiment.py": "8ee944d98395d489d2408e36e8f5167c7b5edad6e1519c9dacaa1d5a60610f57",
+      "src/edge_ai/model.py": "9bfb066c8efab17d3fa8b76dcd2910fb27ef071029f1a9de45234c597525ebe1",
+      "tests/conftest.py": "0e19045dc2ffbd921e77e8004f39e9db54cff5b072973574c206759c558ea231",
+      "tests/test_dataset.py": "31ac493d998ba188472bc281c1dc676beef3e5673a91cfb95f60cc8586744ee0",
+      "tests/test_experiment.py": "d57a437c5797be1d62d8c5782bdb6d3cc7bf04ebab60a2321a7582e98b23da7c",
+      "tests/test_onnx_parity.py": "a5252fb56b39cfbfabb321453f14af1c6d96153afc19dd58fb2b0214f455451f"
+    }
+  },
+  "dataset_sha256": "b02551622aac02d513347867e88f0e55ff560290ce84765dd58c65d4d015c03d",
+  "model_sha256": "e52ea0bc5fba5218c8de5573e668c357efb8911dad8be325e102abcc08c512fe",
+  "dataset_metadata": {
+    "forecast_steps": 20,
+    "generator": "make_runs_v1",
+    "num_runs": 60,
+    "sample_period_s": 0.1,
+    "seed": 42,
+    "steps_per_run": 200,
+    "temperature_reference": "first measurement of each run",
+    "vibration_units": "arbitrary synthetic units",
+    "window_size": 32
+  },
+  "split": {
+    "train": [
+      28,
+      55,
+      18,
+      24,
+      7,
+      17,
+      27,
+      50,
+      59,
+      39,
+      44,
+      5,
+      57,
+      25,
+      29,
+      31,
+      37,
+      20,
+      52,
+      49,
+      42,
+      54,
+      48,
+      4,
+      26,
+      15,
+      32,
+      23,
+      40,
+      9,
+      56,
+      21,
+      16,
+      3,
+      34,
+      30,
+      10,
+      46,
+      53,
+      6,
+      38,
+      11
+    ],
+    "validation": [
+      51,
+      41,
+      22,
+      19,
+      35,
+      0,
+      47,
+      45,
+      12
+    ],
+    "test": [
+      43,
+      14,
+      58,
+      2,
+      36,
+      33,
+      1,
+      13,
+      8
+    ]
+  },
+  "sample_counts": {
+    "train": 6258,
+    "validation": 1341,
+    "test": 1341
+  },
+  "ridge": {
+    "selected_alpha": 0.01,
+    "selection": "minimum validation RMSE; fit on training runs only",
+    "candidates": [
+      {
+        "alpha": 1e-06,
+        "validation_rmse_mm": 0.0005255184548118049
+      },
+      {
+        "alpha": 0.0001,
+        "validation_rmse_mm": 0.0005255014208941828
+      },
+      {
+        "alpha": 0.01,
+        "validation_rmse_mm": 0.0005241674244286789
+      },
+      {
+        "alpha": 1.0,
+        "validation_rmse_mm": 0.0006150275541088139
+      }
+    ]
+  },
+  "metrics": {
+    "neural": {
+      "mae_mm": 0.0005250294686042989,
+      "rmse_mm": 0.0006706080125742045,
+      "max_abs_error_mm": 0.0024878927506506443
+    },
+    "last_value_proxy": {
+      "mae_mm": 0.0017153501746228754,
+      "rmse_mm": 0.0020121970687254904,
+      "max_abs_error_mm": 0.0050379144959151745
+    },
+    "linear_full_window": {
+      "mae_mm": 0.0004640423805934516,
+      "rmse_mm": 0.0005736113928178167,
+      "max_abs_error_mm": 0.0016559226290869533
+    },
+    "ridge_full_window": {
+      "mae_mm": 0.00046351332416832454,
+      "rmse_mm": 0.0005733335315169545,
+      "max_abs_error_mm": 0.00164708507082721
+    }
+  }
+}
