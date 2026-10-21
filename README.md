@@ -79,12 +79,12 @@ One recorded benchmark run on the development PC:
 | Intra-op threads | 1 |
 | Warm-up iterations | 100 |
 | Measured iterations | 5,000 |
-| Average latency | 15.706 µs |
-| Median latency | 15.300 µs |
+| Average latency | 15.544 µs |
+| Median latency | 15.200 µs |
 | P95 latency | 16.300 µs |
-| P99 latency | 27.100 µs |
-| Minimum latency | 14.100 µs |
-| Maximum latency | 82.100 µs |
+| P99 latency | 28.600 µs |
+| Minimum latency | 13.700 µs |
+| Maximum latency | 93.700 µs |
 
 These statistics come from one benchmark run using repeated C++ ONNX Runtime CPU inference calls, after 100 warm-up iterations and across 5,000 measured iterations. Results may vary with system load, operating-system scheduling, and software environment.
 
