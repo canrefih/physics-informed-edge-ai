@@ -3,7 +3,9 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cmath>
 #include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <numeric>
@@ -23,7 +25,7 @@ double percentile(std::vector<double> values, double p) {
     return values[std::min(index, values.size() - 1)];
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     try {
         const std::filesystem::path model_path =
             "artifacts/model.onnx";
@@ -33,7 +35,7 @@ int main() {
                 "Model not found: artifacts/model.onnx");
         }
 
-        Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "RollomaticEdgeAI");
+        Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "ThermalDriftEdgeAI");
 
         Ort::SessionOptions options;
         options.SetIntraOpNumThreads(1);
@@ -54,6 +56,24 @@ int main() {
 
             input[t * 2] = temperature_delta / 10.0f;
             input[t * 2 + 1] = vibration;
+        }
+        bool predict_only = false;
+        if (argc > 1) {
+            if (argc != 4 || std::string(argv[1]) != "--input" ||
+                std::string(argv[3]) != "--predict-only") {
+                throw std::runtime_error("Usage: edge_ai_cpp [--input FILE --predict-only]");
+            }
+            std::ifstream file(argv[2]);
+            for (auto& value : input) {
+                if (!(file >> value) || !std::isfinite(value)) {
+                    throw std::runtime_error("Input must contain 64 finite, preprocessed floats");
+                }
+            }
+            std::string extra;
+            if (file >> extra) {
+                throw std::runtime_error("Input must contain exactly 64 floats");
+            }
+            predict_only = true;
         }
 
         auto memory_info = Ort::MemoryInfo::CreateCpu(
@@ -78,6 +98,13 @@ int main() {
                 output_names,
                 1);
         };
+        if (predict_only) {
+            auto output = run_inference();
+            std::cout << std::fixed << std::setprecision(9)
+                      << "Predicted drift: " << output[0].GetTensorData<float>()[0]
+                      << " mm\n";
+            return 0;
+        }
 
         constexpr int warmup_iterations = 100;
         constexpr int iterations = 5000;
@@ -117,11 +144,11 @@ int main() {
             latency_us.begin(), latency_us.end());
 
         std::cout << std::fixed << std::setprecision(3);
-        std::cout << "\n=== Rollomatic Edge AI | C++ Benchmark ===\n";
+        std::cout << "\n=== Thermal Drift Edge AI | C++ Benchmark ===\n";
         std::cout << "Model: " << model_path.string() << '\n';
         std::cout << "Input shape: [1, 32, 2]\n";
         std::cout << "Predicted drift: "
-                  << std::setprecision(6)
+                  << std::setprecision(9)
                   << predicted_drift_mm << " mm\n";
         std::cout << "Predicted drift: "
                   << predicted_drift_mm * 1000.0f << " um\n";

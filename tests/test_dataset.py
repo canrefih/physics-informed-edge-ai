@@ -31,6 +31,13 @@ def test_windows_stay_inside_each_run():
 
     assert len(X) == 3 * (70 - 8 - 2 + 1)
     assert set(ids) == {0, 1, 2}
+    windows_per_run = 70 - 8 - 2 + 1
+    for index, (window, target, run_id) in enumerate(zip(X, y, ids)):
+        start = index % windows_per_run
+        run = runs[run_id]
+        np.testing.assert_array_equal(window[:, 0], run["temperature_delta_c"][start:start + 8])
+        np.testing.assert_array_equal(window[:, 1], run["vibration_rms"][start:start + 8])
+        assert target == run["drift_mm"][start + 8 - 1 + 2]
 
 
 def test_invalid_run_count():

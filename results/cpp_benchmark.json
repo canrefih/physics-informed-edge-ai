@@ -1,0 +1,90 @@
+{
+  "environment": {
+    "created_at_utc": "2026-10-21T15:00:30.098508+00:00",
+    "python": "3.14.7",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "packages": {
+      "numpy": "2.5.4",
+      "torch": "2.14.1",
+      "onnx": "1.23.2",
+      "onnxruntime": "1.31.0",
+      "onnxscript": "0.7.2",
+      "pytest": "9.1.1",
+      "matplotlib": "3.11.2"
+    },
+    "source_commit": "2088e0b0464823142461750a9702e8f0d9c011d9",
+    "source_dirty": true,
+    "source_files_sha256": {
+      "CMakeLists.txt": "ff97c4a6407ccf63f8706d09c51e68677dcdb4b64355f31182d2d378b79bcbcd",
+      "cpp/main.cpp": "ff9e60e61b293b20826fd0f67b62c2002f21b86dfad9685349d103050a0de28e",
+      "requirements.txt": "b00e4ede40beb8ff7c407df4e11c707e0df7bc0bb427c04a21c495ca829ba6c6",
+      "scripts/benchmark_cpp.py": "ba82a6c33793ce577ff0356dea686d5a5db54d17f0222dabf04ebd9e0cadfc3e",
+      "scripts/compare_cpp.py": "40268388b633ffb480af6d63e0857591c4b132d8457ce052e7f27cb54a948a61",
+      "scripts/evaluate.py": "a1a72c8e43ff76c600e472145b6830b8cd2aa7b423ab7c9f27f3c91b3398c5c8",
+      "scripts/export_onnx.py": "fd9cf394408cc12fd2b4b5d0f95da69e0b6b69e5f7a52de2938df4dc5377f6fb",
+      "scripts/generate_data.py": "af83d7b08a8b021ceb8b55c31e109de5d53538980897a7bf34a074708ac5cbe9",
+      "scripts/plot_results.py": "934a7c96f04a3c7fba5db5f03c19b70cc185cae05e7be6a82184fe83c48ff5cb",
+      "scripts/train.py": "c35bd0a684ac0eeb304a0abcfa06829e2b36bbd11eb2b0d11199700bf903b626",
+      "src/edge_ai/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/edge_ai/dataset.py": "a2e119f85c3a04ff7fd848ce1015dd890caefa7631fc7e0ccd0144b59bd84f56",
+      "src/edge_ai/experiment.py": "8ee944d98395d489d2408e36e8f5167c7b5edad6e1519c9dacaa1d5a60610f57",
+      "src/edge_ai/model.py": "9bfb066c8efab17d3fa8b76dcd2910fb27ef071029f1a9de45234c597525ebe1",
+      "tests/conftest.py": "0e19045dc2ffbd921e77e8004f39e9db54cff5b072973574c206759c558ea231",
+      "tests/test_dataset.py": "31ac493d998ba188472bc281c1dc676beef3e5673a91cfb95f60cc8586744ee0",
+      "tests/test_experiment.py": "d57a437c5797be1d62d8c5782bdb6d3cc7bf04ebab60a2321a7582e98b23da7c",
+      "tests/test_onnx_parity.py": "a5252fb56b39cfbfabb321453f14af1c6d96153afc19dd58fb2b0214f455451f"
+    }
+  },
+  "cpu_identifier": "Intel64 Family 6 Model 158 Stepping 10, GenuineIntel",
+  "model_sha256": "90427210f52390f7ca3c531e04a7f55429cac74b876165cbf04cefe506670f2b",
+  "executable_sha256": "a5ec20237232b905c3c17d1f0c82d103e1608abcb8d8ac5d7277c756e0e58eaf",
+  "build": "Release",
+  "cpp_onnxruntime_version": "1.31.0",
+  "intra_op_threads": 1,
+  "warmup_iterations_per_run": 100,
+  "measured_iterations_per_run": 5000,
+  "scope": "steady_clock around Session::Run on the same preallocated CPU input; output allocation included",
+  "excluded": [
+    "sensor acquisition",
+    "preprocessing",
+    "model loading",
+    "startup",
+    "communication",
+    "control response"
+  ],
+  "runs": [
+    {
+      "metrics": {
+        "average_us": 16.315,
+        "median_us": 15.9,
+        "p95_us": 17.9,
+        "p99_us": 31.3,
+        "min_us": 14.3,
+        "max_us": 47.6
+      },
+      "stdout": "\n=== Thermal Drift Edge AI | C++ Benchmark ===\nModel: artifacts/model.onnx\nInput shape: [1, 32, 2]\nPredicted drift: 0.034147076 mm\nPredicted drift: 34.147075653 um\nWarm-up iterations: 100\nMeasured iterations: 5000\nAverage latency: 16.315 us\nMedian latency:  15.900 us\nP95 latency:     17.900 us\nP99 latency:     31.300 us\nMin latency:     14.300 us\nMax latency:     47.600 us\n"
+    },
+    {
+      "metrics": {
+        "average_us": 16.623,
+        "median_us": 15.9,
+        "p95_us": 19.3,
+        "p99_us": 31.7,
+        "min_us": 15.1,
+        "max_us": 155.8
+      },
+      "stdout": "\n=== Thermal Drift Edge AI | C++ Benchmark ===\nModel: artifacts/model.onnx\nInput shape: [1, 32, 2]\nPredicted drift: 0.034147076 mm\nPredicted drift: 34.147075653 um\nWarm-up iterations: 100\nMeasured iterations: 5000\nAverage latency: 16.623 us\nMedian latency:  15.900 us\nP95 latency:     19.300 us\nP99 latency:     31.700 us\nMin latency:     15.100 us\nMax latency:     155.800 us\n"
+    },
+    {
+      "metrics": {
+        "average_us": 16.838,
+        "median_us": 16.3,
+        "p95_us": 17.7,
+        "p99_us": 31.0,
+        "min_us": 15.6,
+        "max_us": 95.8
+      },
+      "stdout": "\n=== Thermal Drift Edge AI | C++ Benchmark ===\nModel: artifacts/model.onnx\nInput shape: [1, 32, 2]\nPredicted drift: 0.034147076 mm\nPredicted drift: 34.147075653 um\nWarm-up iterations: 100\nMeasured iterations: 5000\nAverage latency: 16.838 us\nMedian latency:  16.300 us\nP95 latency:     17.700 us\nP99 latency:     31.000 us\nMin latency:     15.600 us\nMax latency:     95.800 us\n"
+    }
+  ]
+}

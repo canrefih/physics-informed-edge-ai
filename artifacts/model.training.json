@@ -1,0 +1,337 @@
+{
+  "schema_version": 1,
+  "dataset_sha256": "b02551622aac02d513347867e88f0e55ff560290ce84765dd58c65d4d015c03d",
+  "dataset_metadata": {
+    "forecast_steps": 20,
+    "generator": "make_runs_v1",
+    "num_runs": 60,
+    "sample_period_s": 0.1,
+    "seed": 42,
+    "steps_per_run": 200,
+    "temperature_reference": "first measurement of each run",
+    "vibration_units": "arbitrary synthetic units",
+    "window_size": 32
+  },
+  "split": {
+    "train": [
+      28,
+      55,
+      18,
+      24,
+      7,
+      17,
+      27,
+      50,
+      59,
+      39,
+      44,
+      5,
+      57,
+      25,
+      29,
+      31,
+      37,
+      20,
+      52,
+      49,
+      42,
+      54,
+      48,
+      4,
+      26,
+      15,
+      32,
+      23,
+      40,
+      9,
+      56,
+      21,
+      16,
+      3,
+      34,
+      30,
+      10,
+      46,
+      53,
+      6,
+      38,
+      11
+    ],
+    "validation": [
+      51,
+      41,
+      22,
+      19,
+      35,
+      0,
+      47,
+      45,
+      12
+    ],
+    "test": [
+      43,
+      14,
+      58,
+      2,
+      36,
+      33,
+      1,
+      13,
+      8
+    ]
+  },
+  "preprocessing": {
+    "temperature_divisor": 10.0,
+    "vibration_divisor": 1.0
+  },
+  "training": {
+    "seed": 42,
+    "epochs": 50,
+    "threads": 1,
+    "batch_size": 128,
+    "optimizer": "Adam",
+    "learning_rate": 0.001,
+    "loss": "MSE",
+    "device": "cpu"
+  },
+  "environment": {
+    "created_at_utc": "2026-10-21T14:59:57.887436+00:00",
+    "python": "3.14.7",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "packages": {
+      "numpy": "2.5.4",
+      "torch": "2.14.1",
+      "onnx": "1.23.2",
+      "onnxruntime": "1.31.0",
+      "onnxscript": "0.7.2",
+      "pytest": "9.1.1",
+      "matplotlib": "3.11.2"
+    },
+    "source_commit": "2088e0b0464823142461750a9702e8f0d9c011d9",
+    "source_dirty": true,
+    "source_files_sha256": {
+      "CMakeLists.txt": "ff97c4a6407ccf63f8706d09c51e68677dcdb4b64355f31182d2d378b79bcbcd",
+      "cpp/main.cpp": "ff9e60e61b293b20826fd0f67b62c2002f21b86dfad9685349d103050a0de28e",
+      "requirements.txt": "b00e4ede40beb8ff7c407df4e11c707e0df7bc0bb427c04a21c495ca829ba6c6",
+      "scripts/benchmark_cpp.py": "ba82a6c33793ce577ff0356dea686d5a5db54d17f0222dabf04ebd9e0cadfc3e",
+      "scripts/compare_cpp.py": "40268388b633ffb480af6d63e0857591c4b132d8457ce052e7f27cb54a948a61",
+      "scripts/evaluate.py": "a1a72c8e43ff76c600e472145b6830b8cd2aa7b423ab7c9f27f3c91b3398c5c8",
+      "scripts/export_onnx.py": "fd9cf394408cc12fd2b4b5d0f95da69e0b6b69e5f7a52de2938df4dc5377f6fb",
+      "scripts/generate_data.py": "af83d7b08a8b021ceb8b55c31e109de5d53538980897a7bf34a074708ac5cbe9",
+      "scripts/plot_results.py": "934a7c96f04a3c7fba5db5f03c19b70cc185cae05e7be6a82184fe83c48ff5cb",
+      "scripts/train.py": "c35bd0a684ac0eeb304a0abcfa06829e2b36bbd11eb2b0d11199700bf903b626",
+      "src/edge_ai/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/edge_ai/dataset.py": "a2e119f85c3a04ff7fd848ce1015dd890caefa7631fc7e0ccd0144b59bd84f56",
+      "src/edge_ai/experiment.py": "8ee944d98395d489d2408e36e8f5167c7b5edad6e1519c9dacaa1d5a60610f57",
+      "src/edge_ai/model.py": "9bfb066c8efab17d3fa8b76dcd2910fb27ef071029f1a9de45234c597525ebe1",
+      "tests/conftest.py": "0e19045dc2ffbd921e77e8004f39e9db54cff5b072973574c206759c558ea231",
+      "tests/test_dataset.py": "31ac493d998ba188472bc281c1dc676beef3e5673a91cfb95f60cc8586744ee0",
+      "tests/test_experiment.py": "d57a437c5797be1d62d8c5782bdb6d3cc7bf04ebab60a2321a7582e98b23da7c",
+      "tests/test_onnx_parity.py": "a5252fb56b39cfbfabb321453f14af1c6d96153afc19dd58fb2b0214f455451f"
+    }
+  },
+  "model_sha256": "e52ea0bc5fba5218c8de5573e668c357efb8911dad8be325e102abcc08c512fe",
+  "best_validation_rmse_mm": 0.0005925325527774501,
+  "history": [
+    {
+      "epoch": 1,
+      "validation_rmse_mm": 0.012973501061562686
+    },
+    {
+      "epoch": 2,
+      "validation_rmse_mm": 0.004510318971287251
+    },
+    {
+      "epoch": 3,
+      "validation_rmse_mm": 0.0021219336048780182
+    },
+    {
+      "epoch": 4,
+      "validation_rmse_mm": 0.0019919279724338696
+    },
+    {
+      "epoch": 5,
+      "validation_rmse_mm": 0.0018888850623873805
+    },
+    {
+      "epoch": 6,
+      "validation_rmse_mm": 0.0018212725189399792
+    },
+    {
+      "epoch": 7,
+      "validation_rmse_mm": 0.001750027320990943
+    },
+    {
+      "epoch": 8,
+      "validation_rmse_mm": 0.0016897160523258582
+    },
+    {
+      "epoch": 9,
+      "validation_rmse_mm": 0.0016387120673523473
+    },
+    {
+      "epoch": 10,
+      "validation_rmse_mm": 0.001603501555142991
+    },
+    {
+      "epoch": 11,
+      "validation_rmse_mm": 0.0014996922067839285
+    },
+    {
+      "epoch": 12,
+      "validation_rmse_mm": 0.0014204550759379015
+    },
+    {
+      "epoch": 13,
+      "validation_rmse_mm": 0.0013561642784586491
+    },
+    {
+      "epoch": 14,
+      "validation_rmse_mm": 0.0012274708654088195
+    },
+    {
+      "epoch": 15,
+      "validation_rmse_mm": 0.0011405412556275806
+    },
+    {
+      "epoch": 16,
+      "validation_rmse_mm": 0.0010353261942487387
+    },
+    {
+      "epoch": 17,
+      "validation_rmse_mm": 0.0009782345969539129
+    },
+    {
+      "epoch": 18,
+      "validation_rmse_mm": 0.0009069287311814435
+    },
+    {
+      "epoch": 19,
+      "validation_rmse_mm": 0.0009057456551256657
+    },
+    {
+      "epoch": 20,
+      "validation_rmse_mm": 0.0008240081018135669
+    },
+    {
+      "epoch": 21,
+      "validation_rmse_mm": 0.0007881704984241365
+    },
+    {
+      "epoch": 22,
+      "validation_rmse_mm": 0.0007664482448882172
+    },
+    {
+      "epoch": 23,
+      "validation_rmse_mm": 0.0007371342253403184
+    },
+    {
+      "epoch": 24,
+      "validation_rmse_mm": 0.0007181842773481906
+    },
+    {
+      "epoch": 25,
+      "validation_rmse_mm": 0.0006932190235344988
+    },
+    {
+      "epoch": 26,
+      "validation_rmse_mm": 0.0007442841897768328
+    },
+    {
+      "epoch": 27,
+      "validation_rmse_mm": 0.000670904946292112
+    },
+    {
+      "epoch": 28,
+      "validation_rmse_mm": 0.0006555659932483051
+    },
+    {
+      "epoch": 29,
+      "validation_rmse_mm": 0.0006489793138293242
+    },
+    {
+      "epoch": 30,
+      "validation_rmse_mm": 0.0006496375394706651
+    },
+    {
+      "epoch": 31,
+      "validation_rmse_mm": 0.0006396571199623749
+    },
+    {
+      "epoch": 32,
+      "validation_rmse_mm": 0.0006290639307403465
+    },
+    {
+      "epoch": 33,
+      "validation_rmse_mm": 0.0006418812212931517
+    },
+    {
+      "epoch": 34,
+      "validation_rmse_mm": 0.000617149865408526
+    },
+    {
+      "epoch": 35,
+      "validation_rmse_mm": 0.0006234105161486129
+    },
+    {
+      "epoch": 36,
+      "validation_rmse_mm": 0.0006501164703108549
+    },
+    {
+      "epoch": 37,
+      "validation_rmse_mm": 0.0006354142973357927
+    },
+    {
+      "epoch": 38,
+      "validation_rmse_mm": 0.0006092656755897733
+    },
+    {
+      "epoch": 39,
+      "validation_rmse_mm": 0.0006069126751157477
+    },
+    {
+      "epoch": 40,
+      "validation_rmse_mm": 0.0005995519550793702
+    },
+    {
+      "epoch": 41,
+      "validation_rmse_mm": 0.0006096528335989633
+    },
+    {
+      "epoch": 42,
+      "validation_rmse_mm": 0.0006286001353928069
+    },
+    {
+      "epoch": 43,
+      "validation_rmse_mm": 0.0005980796943801485
+    },
+    {
+      "epoch": 44,
+      "validation_rmse_mm": 0.0005925325527774501
+    },
+    {
+      "epoch": 45,
+      "validation_rmse_mm": 0.000598910389235547
+    },
+    {
+      "epoch": 46,
+      "validation_rmse_mm": 0.0006550382871453831
+    },
+    {
+      "epoch": 47,
+      "validation_rmse_mm": 0.0005942530832663556
+    },
+    {
+      "epoch": 48,
+      "validation_rmse_mm": 0.0006012607662198176
+    },
+    {
+      "epoch": 49,
+      "validation_rmse_mm": 0.0006195730774166373
+    },
+    {
+      "epoch": 50,
+      "validation_rmse_mm": 0.0007370990219276182
+    }
+  ]
+}
